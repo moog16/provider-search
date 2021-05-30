@@ -26,17 +26,21 @@ export default function MapContextProvider({
 
   useEffect(() => {
     const updatedProviders = providersResponse.filter((provider) => {
-      const {specialties} = filtersState
+      const {specialties, location, name} = filtersState
       const hasMatchingSpecialty = !specialties.length || provider.specialties.some((specialty) => specialties.includes(specialty))
       if (!hasMatchingSpecialty) {
         return false
       }
-      const locationLat = filtersState.location?.latitude
-      const locationLng = filtersState.location?.longitude
+      const hasMatchingName = provider.name?.toLowerCase().includes(name?.toLowerCase())
+      if (!hasMatchingName) {
+        return false
+      }
+      const locationLat = location?.latitude
+      const locationLng = location?.longitude
       if (locationLat && locationLng) {
         const providerLatLng = provider.location.latLng
         const distance = getDistanceFromLatLonInMi(locationLat, locationLng, providerLatLng.lat, providerLatLng.lng) 
-        const isNearLocation = distance <= 25
+        const isNearLocation = distance <= location?.radius
         if (!isNearLocation) {
           return false
         }

@@ -16,7 +16,8 @@ export default function ProviderFilters() {
     if (!value) {
       return 
     }
-    const data = await axios.get(`https://nominatim.openstreetmap.org/search?q=${value} noe st&format=json&limit=1`)
+    const data = await axios.get(
+        `https://nominatim.openstreetmap.org/search?q=${value} noe st&format=json&limit=1`)
     const location = data?.data[0]
     if (!location) {
       return

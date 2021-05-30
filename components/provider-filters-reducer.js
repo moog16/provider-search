@@ -5,8 +5,7 @@ import specialtiesOptions from "../public/specialties.json";
 export const filtersInitialState = {
   specialties: Object.keys(specialtiesOptions),  
   location: null,
-  limit: 100,
-  offset: 0,
+  name: '',
 }
 
 export default produce((state, action) => {
@@ -22,6 +21,9 @@ export default produce((state, action) => {
       )
       break
     }
+    case 'SET_NAME':
+      state.name = action.name
+      break
     case 'SET_ALL_SPECIALTIES': {
       state.specialties = Object.keys(specialtiesOptions)
       break
@@ -35,7 +37,6 @@ export default produce((state, action) => {
       break
     case 'SET_LOCATION':
       state.location = state.location || {}
-      // state.location.radius = action.radius || state.location?.radius || 25
       if (action.title) {
         state.location.title = action.title
       }
@@ -43,6 +44,15 @@ export default produce((state, action) => {
         state.location.latitude = action.latitude
         state.location.longitude = action.longitude
       }
+      if (state.location.latitude && state.location.longitude) {
+        state.location.radius = action.radius || state.location?.radius || 100
+      }
+
+      break
+    case 'RESET_FILTERS': 
+      state.name = ''
+      state.location = null
+      state.specialties = Object.keys(specialtiesOptions)
       break
   }
 })

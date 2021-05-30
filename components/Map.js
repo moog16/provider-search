@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useReducer,useContext } from "react";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import FiltersModal from "./FiltersModal";
 import {MapContext} from './MapContextProvider'
 import filtersReducer, {filtersInitialState} from './provider-filters-reducer'
 import PaginationBox from './PaginationBox'
+import SearchIcon from './SearchIcon';
+import getDistanceFromLatLonInMi from '../utils/distance'
 
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css"
@@ -25,11 +27,11 @@ export default function Map() {
   const [leafletMap, setLeafletMap] = useState(null);
   const LeafletRef = useRef(null);
   const hasInitMap = useRef(false);
-  const {providers} = useContext(MapContext)
-  const [filtersState] = useReducer(
-    filtersReducer,
-    filtersInitialState,
-  )
+  const didZoomUpdateRef = useRef(false);
+  const didMoveUpdateRef = useRef(false);
+  const markerLayerGroupRef = useRef(null);
+  const {setIsShowingFilters, providers, filtersDispatch, filtersState} = useContext(MapContext)
+  const {location} = filtersState
 
   useEffect(async () => {
     // init map
@@ -46,10 +48,21 @@ export default function Map() {
       attribution: '© <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
-    setLeafletMap(LeafletRef.current.map(mapRef.current, {
+    const map = LeafletRef.current.map(mapRef.current, {
       center: [51.505, -0.09],
       zoom: 13,
-    })?.addLayer(osmLayer));
+    })?.addLayer(osmLayer)
+    setLeafletMap(map);
+    map.on('zoomend', () => {
+      const {_northEast, _southWest} = map.getBounds()
+      const distance = getDistanceFromLatLonInMi(_northEast.lat, _northEast.lng, _southWest.lat, _southWest.lng) 
+      const radius = distance/2
+      filtersDispatch({
+        type: 'SET_LOCATION',
+        radius
+      })
+      didZoomUpdateRef.current = true
+    })
   });
 
   const iconCreateFunction = (cluster) => {
@@ -67,14 +80,19 @@ export default function Map() {
     }
 
     const mapPin = createMapIcon(LeafletRef.current)
+    if (!markerLayerGroupRef.current && leafletMap) {
+      markerLayerGroupRef.current = LeafletRef.current.layerGroup().addTo(leafletMap);
+
+    }
+
+    // // remove all the markers in one go
+    markerLayerGroupRef.current?.clearLayers();
 
     const latLngMarkerLatLngs = []
     const markers = LeafletRef.current.markerClusterGroup({
       iconCreateFunction
     });
 
-  console.log(providers)
-  debugger
     providers.map((provider, index) => {
       const {lat, lng} = provider.location.latLng
       const leafleftLatLng = LeafletRef.current.latLng(lat, lng)
@@ -98,15 +116,53 @@ export default function Map() {
       )
       markers?.addLayer(marker);
     })
-    leafletMap?.addLayer(markers)
-
-    leafletMap.fitBounds(latLngMarkerLatLngs)
+    markerLayerGroupRef.current?.addLayer(markers)
+    if (!didZoomUpdateRef.current && leafletMap && latLngMarkerLatLngs.length) {
+      leafletMap.fitBounds(latLngMarkerLatLngs)
+    }
+    didZoomUpdateRef.current = false
   }, [providers, leafletMap])
 
   return (
     <Box ref={mapRef} h="100%" w="100vw">
-      <FiltersModal />
+      <Button
+        leftIcon={<SearchIcon />}
+        colorScheme='whatsapp'
+        onClick={() => setIsShowingFilters(true)}
+        position='absolute'
+        top={5}
+        right={5}
+        zIndex={500}
+      >
+        Search
+      </Button>
+
+       <FiltersModal />
       <PaginationBox />
+      {
+        location?.latitude && location?.longitude && <Flex
+            position='absolute'
+            bottom={[44]}
+            left={4}
+            zIndex={500}>
+          <Button 
+            bgColor='whatsapp.200'
+            onClick={() => {
+              const center = LeafletRef.current.latLng(location.latitude, location.longitude)
+              leafletMap?.panTo(center)
+            }}
+          >
+            Center Map
+          </Button>
+          <Button bgColor='gray.200' ml={4} onClick={() => {
+            filtersDispatch({
+              type: 'RESET_FILTERS'
+            })
+          }}>
+            Reset Filters
+          </Button>
+        </Flex>
+      }
     </Box>
   );
 }
