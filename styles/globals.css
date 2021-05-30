@@ -14,3 +14,18 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.cluster-icon {
+  margin: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  background: #C05621;
+  color: white;
+  font-size: 16px;
+  border: 3px solid #363286;
+  font-weight: 700;
+}

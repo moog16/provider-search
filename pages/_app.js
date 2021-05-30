@@ -3,11 +3,7 @@ import "../styles/globals.css";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import MapContextProvider from "../components/MapContextProvider";
 
-const theme = extendTheme({
-  fonts: {
-    heading: `'Merriweather', serif`,
-  },
-});
+const theme = extendTheme({});
 
 function App({ Component, pageProps }) {
   return (

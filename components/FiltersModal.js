@@ -22,7 +22,7 @@ export default function FiltersModal() {
           <Box>
             <ProviderSpecialtiesFilter />
           </Box>
-          <Button onClick={() => setIsShowingFilters(false)} isFullWidth={[true, null, false]} bgColor='whatsapp.500' mt={8}>
+          <Button onClick={() => setIsShowingFilters(false)} isFullWidth={[true, null, false]} bgColor='whatsapp.500' my={8} color='white'>
             Search
           </Button>
         </ModalBody>

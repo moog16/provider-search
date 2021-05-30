@@ -34,7 +34,7 @@ export default function MapContextProvider({
       const locationLat = filtersState.location?.latitude
       const locationLng = filtersState.location?.longitude
       if (locationLat && locationLng) {
-        const providerLatLng = provider.locations[0].latLng
+        const providerLatLng = provider.location.latLng
         const distance = getDistanceFromLatLonInMi(locationLat, locationLng, providerLatLng.lat, providerLatLng.lng) 
         const isNearLocation = distance <= 25
         if (!isNearLocation) {
@@ -46,7 +46,7 @@ export default function MapContextProvider({
     })
 
     setTotalResults(updatedProviders.length)
-    setProviders(updatedProviders.slice(filtersState.offset, filtersState.limit + filtersState.offset))
+    setProviders(updatedProviders)
   }, [filtersState])
 
 
@@ -68,7 +68,7 @@ export default function MapContextProvider({
 // "api_version": "FHIR STU3 3.0.1",
 // "status": "connection_working",
 // "ehr": "eClinicalWorks",
-// "locations": [
+// "location": 
 //     {
 //         "name": "Archana Srivastava MD PA Dallas TX",
 //         "address": {
@@ -82,5 +82,5 @@ export default function MapContextProvider({
 //         },
 //         "latLng": {"lat":30.191096,"lng":-97.818873}
 //     }
-// ]
+// 
 // 4305 W Wheatland Rd Dallas TX 75237

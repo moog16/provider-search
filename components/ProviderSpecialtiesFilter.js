@@ -1,11 +1,14 @@
-import {useReducer, useContext} from 'react'
-import { Box,Text, Select, Checkbox, VStack } from "@chakra-ui/react";
+import {useReducer, useContext, useState} from 'react'
+import { Box,Text,Button, Select, Checkbox, VStack } from "@chakra-ui/react";
 
 import {MapContext} from './MapContextProvider'
+import ChevronDown from './ChevronDown'
+import ChevronUp from './ChevronUp'
 import specialtiesOptions from "../public/specialties.json";
 
 export default function ProviderFilters() {
   const {filtersState, filtersDispatch} = useContext(MapContext)
+  const [isShowingMore, setIsShowingMore] = useState(false)
   const {specialties} = filtersState
   const allChecked = Object.keys(specialtiesOptions).length === specialties.length
   const isIndeterminate = specialties.length > 0 && !allChecked
@@ -49,7 +52,7 @@ export default function ProviderFilters() {
         >
           <Text fontWeight='semibold'>All specialties</Text>
         </Checkbox>
-        {Object.keys(specialtiesOptions).map((specialtyId, index) => {
+        {Object.keys(specialtiesOptions).slice(0, isShowingMore ? undefined : 5).map((specialtyId, index) => {
           return (
             <Checkbox
               pl={4}
@@ -64,6 +67,14 @@ export default function ProviderFilters() {
             </Checkbox>
           )
         })}
+        <Button
+          variant='ghost'
+          onClick={() => setIsShowingMore(!isShowingMore)} 
+          rightIcon={isShowingMore ? <ChevronUp /> : <ChevronDown />}
+          px={0}
+        >
+          Show {isShowingMore ? 'less' : 'more'} 
+        </Button>
       </VStack>
     </>
   );

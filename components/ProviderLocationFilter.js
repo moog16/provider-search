@@ -28,7 +28,7 @@ export default function ProviderFilters() {
       title: location.display_name
     })
     if (location.display_name) {
-      setLocationValue(location.display_name)
+      setLocationValue('')
     }
   }
 

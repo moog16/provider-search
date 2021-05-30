@@ -8,7 +8,6 @@ import PaginationBox from './PaginationBox'
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css"
 
-
 function createMapIcon(LeafletRef) {
   return LeafletRef.icon({
       iconUrl: './map_pin.svg',
@@ -19,6 +18,7 @@ function createMapIcon(LeafletRef) {
       shadowAnchor: [22, 94]
   });
 }
+
 export default function Map() {
   const mapRef = useRef(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
@@ -32,10 +32,12 @@ export default function Map() {
   )
 
   useEffect(async () => {
+    // init map
     if (window === undefined || !mapRef.current || hasInitMap.current) {
       return;
     }
     hasInitMap.current = true
+    // requires window - need dynamic import
     LeafletRef.current = (await import("leaflet")).default;
     (await import("leaflet.markercluster/dist/leaflet.markercluster.js")).default
 
@@ -47,10 +49,19 @@ export default function Map() {
     setLeafletMap(LeafletRef.current.map(mapRef.current, {
       center: [51.505, -0.09],
       zoom: 13,
-    }).addLayer(osmLayer));
+    })?.addLayer(osmLayer));
   });
 
+  const iconCreateFunction = (cluster) => {
+    return LeafletRef.current.divIcon({
+      html: cluster.getChildCount(),
+      className: 'cluster-icon',
+      iconSize: LeafletRef.current.point(40, 40)
+    });
+  }
+
   useEffect(() => {
+    // add markers
     if (!LeafletRef.current || !providers) {
       return
     }
@@ -58,17 +69,36 @@ export default function Map() {
     const mapPin = createMapIcon(LeafletRef.current)
 
     const latLngMarkerLatLngs = []
-    const markers = LeafletRef.current.markerClusterGroup();
+    const markers = LeafletRef.current.markerClusterGroup({
+      iconCreateFunction
+    });
 
+  console.log(providers)
+  debugger
     providers.map((provider, index) => {
-      const {lat, lng} = provider.locations[0].latLng
+      const {lat, lng} = provider.location.latLng
       const leafleftLatLng = LeafletRef.current.latLng(lat, lng)
       latLngMarkerLatLngs.push([lat,lng])
-      const marker = LeafletRef.current.marker(leafleftLatLng, {icon: mapPin}).bindPopup(provider.name)
-      markers.addLayer(marker);
-      // LeafletRef.current.marker(leafleftLatLng, {icon: mapPin}).addTo(leafletMap).bindPopup(provider.name)
+      const {name, location} = provider
+      const {address} = location ?? {}
+      const marker = LeafletRef.current.marker(leafleftLatLng, {icon: mapPin}).bindPopup(
+        '<div>' + 
+          '<div>' + 
+            name +
+          '</div>' + 
+          '<div>' + 
+            address?.line?.[0] +
+          '</div>' + 
+          '<div>' + 
+            address?.city +
+            address?.state + ',' +
+            address?.postalCode +
+          '</div>'+ 
+        '</div>'
+      )
+      markers?.addLayer(marker);
     })
-    leafletMap.addLayer(markers)
+    leafletMap?.addLayer(markers)
 
     leafletMap.fitBounds(latLngMarkerLatLngs)
   }, [providers, leafletMap])
