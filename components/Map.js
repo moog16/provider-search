@@ -50,7 +50,7 @@ export default function Map() {
       zoom: 13,
     })?.addLayer(osmLayer)
     setLeafletMap(map);
-    map.on('zoom', () => {
+    map.on('zoomend', () => {
       const {_northEast, _southWest} = map.getBounds()
       const distance = getDistanceFromLatLonInMi(_northEast.lat, _northEast.lng, _southWest.lat, _southWest.lng) 
       const radius = distance/2
@@ -60,9 +60,9 @@ export default function Map() {
       })
       didZoomUpdateRef.current = true
     })
-    map.on('zoomend', () => {
-      didZoomUpdateRef.current = false
-    })
+    // map.on('zoomend', () => {
+    //   didZoomUpdateRef.current = false
+    // })
   });
 
   const iconCreateFunction = (cluster) => {
@@ -117,7 +117,6 @@ export default function Map() {
       markers?.addLayer(marker);
     })
     markerLayerGroupRef.current?.addLayer(markers)
-    console.log(didZoomUpdateRef.current)
     if (!didZoomUpdateRef.current && leafletMap && latLngMarkerLatLngs.length) {
       leafletMap.fitBounds(latLngMarkerLatLngs)
     }

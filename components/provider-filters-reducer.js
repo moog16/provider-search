@@ -45,7 +45,8 @@ export default produce((state, action) => {
         state.location.longitude = action.longitude
       }
       if (state.location.latitude && state.location.longitude) {
-        state.location.radius = action.radius || state.location?.radius || 100
+        const defaultRadius = 100
+        state.location.radius = Math.max((action.radius || defaultRadius), (state.location?.radius || defaultRadius))
       }
 
       break

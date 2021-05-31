@@ -12,6 +12,8 @@ export default function Home() {
         <meta name="description" content="Interactive map to find providers near you" />
         <link rel="stylesheet" href="./leaflet/leaflet.css" />
         <link rel="stylesheet" href=".https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+        {/* <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script> */}
         <script src="./leaflet/leaflet.js"></script>
         <script src='https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js'></script>
       </Head>
