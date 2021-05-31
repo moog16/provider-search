@@ -10,6 +10,10 @@ export default function Home() {
       <Head>
         <title>Provider Search</title>
         <meta name="description" content="Interactive map to find providers near you" />
+        <link rel="stylesheet" href="./leaflet/leaflet.css" />
+        <link rel="stylesheet" href=".https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+        <script src="./leaflet/leaflet.js"></script>
+        <script src='https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js'></script>
       </Head>
       <Flex flexDirection="column" h="100vh">
         <TopAppBar />

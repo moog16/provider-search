@@ -16,7 +16,6 @@
     "axios": "^0.21.1",
     "framer-motion": "^4.1.17",
     "immer": "^9.0.2",
-    "leaflet": "github:Leaflet/Leaflet#master",
     "leaflet.markercluster": "^1.5.0",
     "next": "10.2.3",
     "react": "17.0.2",

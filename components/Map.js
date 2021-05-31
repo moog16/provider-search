@@ -7,8 +7,8 @@ import PaginationBox from './PaginationBox'
 import SearchIcon from './SearchIcon';
 import getDistanceFromLatLonInMi from '../utils/distance'
 
-import "leaflet/dist/leaflet.css";
-import "leaflet.markercluster/dist/MarkerCluster.css"
+// import "leaflet/dist/leaflet.css";
+// import "leaflet.markercluster/dist/MarkerCluster.css"
 
 function createMapIcon(LeafletRef) {
   return LeafletRef.icon({
@@ -39,10 +39,7 @@ export default function Map() {
       return;
     }
     hasInitMap.current = true
-    // requires window - need dynamic import
-    LeafletRef.current = (await import("leaflet")).default;
-    (await import("leaflet.markercluster/dist/leaflet.markercluster.js")).default
-
+    LeafletRef.current = window.L
     const osmLayer = LeafletRef.current.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '© <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
