@@ -53,7 +53,7 @@ export default function Map() {
       zoom: 13,
     })?.addLayer(osmLayer)
     setLeafletMap(map);
-    map.on('zoomend', () => {
+    map.on('zoom', () => {
       const {_northEast, _southWest} = map.getBounds()
       const distance = getDistanceFromLatLonInMi(_northEast.lat, _northEast.lng, _southWest.lat, _southWest.lng) 
       const radius = distance/2
@@ -62,6 +62,9 @@ export default function Map() {
         radius
       })
       didZoomUpdateRef.current = true
+    })
+    map.on('zoomend', () => {
+      didZoomUpdateRef.current = false
     })
   });
 
@@ -117,6 +120,7 @@ export default function Map() {
       markers?.addLayer(marker);
     })
     markerLayerGroupRef.current?.addLayer(markers)
+    console.log(didZoomUpdateRef.current)
     if (!didZoomUpdateRef.current && leafletMap && latLngMarkerLatLngs.length) {
       leafletMap.fitBounds(latLngMarkerLatLngs)
     }
