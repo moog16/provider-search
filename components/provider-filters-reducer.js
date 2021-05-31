@@ -1,9 +1,9 @@
 import produce from 'immer'
-import specialtiesOptions from "../public/specialties.json";
+import specialtiesOptions from '../public/specialties.json'
 
 // specialty, location, page
 export const filtersInitialState = {
-  specialties: Object.keys(specialtiesOptions),  
+  specialties: Object.keys(specialtiesOptions),
   location: null,
   name: '',
 }
@@ -37,6 +37,9 @@ export default produce((state, action) => {
       break
     case 'SET_LOCATION':
       state.location = state.location || {}
+      const didLatLngChange =
+        (action.latitude && state.location?.latitude !== action.latitude) ||
+        (action.longitude && state.location?.longitude !== action.longitude)
       if (action.title) {
         state.location.title = action.title
       }
@@ -44,13 +47,17 @@ export default produce((state, action) => {
         state.location.latitude = action.latitude
         state.location.longitude = action.longitude
       }
-      if (state.location.latitude && state.location.longitude) {
-        const defaultRadius = 100
-        state.location.radius = Math.max((action.radius || defaultRadius), (state.location?.radius || defaultRadius))
+      const defaultRadius = 100
+      if (didLatLngChange) {
+        state.location.radius = defaultRadius
+      } else if (action.radius) {
+        state.location.radius = Math.max(
+          action.radius || defaultRadius,
+          state.location?.radius || defaultRadius,
+        )
       }
-
       break
-    case 'RESET_FILTERS': 
+    case 'RESET_FILTERS':
       state.name = ''
       state.location = null
       state.specialties = Object.keys(specialtiesOptions)

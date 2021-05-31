@@ -1,6 +1,6 @@
-import React, {useEffect, createContext, useState, useReducer} from 'react'
-import filtersReducer,{filtersInitialState} from './provider-filters-reducer'
-import providersResponse from "../public/providers_with_specialties.json";
+import React, { useEffect, createContext, useState, useReducer } from 'react'
+import filtersReducer, { filtersInitialState } from './provider-filters-reducer'
+import providersResponse from '../public/providers_with_specialties.json'
 import getDistanceFromLatLonInMi from '../utils/distance'
 
 export const MapContext = createContext({
@@ -10,11 +10,10 @@ export const MapContext = createContext({
   filtersDispatch: () => {},
   providers: [],
   totalResults: 0,
+  hasFiltersSet: false,
 })
 
-export default function MapContextProvider({
-  children
-}) {
+export default function MapContextProvider({ children }) {
   const [isShowingFilters, setIsShowingFilters] = useState(false)
   const [providers, setProviders] = useState(providersResponse)
   const [totalResults, setTotalResults] = useState(providersResponse.length)
@@ -26,12 +25,18 @@ export default function MapContextProvider({
 
   useEffect(() => {
     const updatedProviders = providersResponse.filter((provider) => {
-      const {specialties, location, name} = filtersState
-      const hasMatchingSpecialty = !specialties.length || provider.specialties.some((specialty) => specialties.includes(specialty))
+      const { specialties, location, name } = filtersState
+      const hasMatchingSpecialty =
+        !specialties.length ||
+        provider.specialties.some((specialty) =>
+          specialties.includes(specialty),
+        )
       if (!hasMatchingSpecialty) {
         return false
       }
-      const hasMatchingName = provider.name?.toLowerCase().includes(name?.toLowerCase())
+      const hasMatchingName = provider.name
+        ?.toLowerCase()
+        .includes(name?.toLowerCase())
       if (!hasMatchingName) {
         return false
       }
@@ -39,7 +44,12 @@ export default function MapContextProvider({
       const locationLng = location?.longitude
       if (locationLat && locationLng) {
         const providerLatLng = provider.location.latLng
-        const distance = getDistanceFromLatLonInMi(locationLat, locationLng, providerLatLng.lat, providerLatLng.lng) 
+        const distance = getDistanceFromLatLonInMi(
+          locationLat,
+          locationLng,
+          providerLatLng.lat,
+          providerLatLng.lng,
+        )
         const isNearLocation = distance <= location?.radius
         if (!isNearLocation) {
           return false
@@ -53,17 +63,21 @@ export default function MapContextProvider({
     setProviders(updatedProviders)
   }, [filtersState])
 
-
-  return <MapContext.Provider value={{
-    isShowingFilters,
-    setIsShowingFilters,
-    filtersState, 
-    filtersDispatch,
-    providers,
-    totalResults
-  }}>
-    {children}
-  </MapContext.Provider>
+  return (
+    <MapContext.Provider
+      value={{
+        isShowingFilters,
+        setIsShowingFilters,
+        filtersState,
+        filtersDispatch,
+        providers,
+        totalResults,
+        hasFiltersSet: providers.length !== providersResponse.length,
+      }}
+    >
+      {children}
+    </MapContext.Provider>
+  )
 }
 // "id": 11580,
 // "name": "Archana Srivastava MD PA Dallas TX",
@@ -72,7 +86,7 @@ export default function MapContextProvider({
 // "api_version": "FHIR STU3 3.0.1",
 // "status": "connection_working",
 // "ehr": "eClinicalWorks",
-// "location": 
+// "location":
 //     {
 //         "name": "Archana Srivastava MD PA Dallas TX",
 //         "address": {
@@ -86,5 +100,5 @@ export default function MapContextProvider({
 //         },
 //         "latLng": {"lat":30.191096,"lng":-97.818873}
 //     }
-// 
+//
 // 4305 W Wheatland Rd Dallas TX 75237
